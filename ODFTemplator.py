@@ -18,7 +18,7 @@ import jinja2
 import pylokit
 
 
-class Error(Exception):
+class TemplatingError(Exception):
 
     def __init__(self, message, cause=None):
         self.message = message
@@ -29,18 +29,6 @@ class Error(Exception):
             return str(self.message)
         else:
             return '{0} {1}'.format(str(self.message), str(self.cause))
-
-
-class TemplateError(Error):
-
-    def __init__(self, cause):
-        super(TemplateError, self).__init__('Template error occurred.', cause=cause)
-
-
-class ConversionError(Error):
-
-    def __init__(self, cause):
-        super(ConversionError, self).__init__('Conversion error occurred.', cause=cause)
 
 
 class Templator(object):
@@ -62,9 +50,9 @@ class Templator(object):
                             data = template.render(**params).encode('utf-8')
                         destination_file.writestr(name, data)
         except IOError as error:
-            raise TemplateError(cause=error)
+            raise TemplatingError('Template error occurred.', cause=error)
         except jinja2.TemplateError as error:
-            raise TemplateError(cause=error)
+            raise TemplatingError('Template error occurred.', cause=error)
 
     def render_pdf(self, template_file_path, pdf_file_path, **params):
         try:
@@ -83,15 +71,17 @@ class Templator(object):
                                      os.path.dirname(pdf_file_path), document_file_path])
                     # TODO: Check failure reason
                     if not os.path.isfile(pdf_file_path):
-                        raise ConversionError(cause=None)
+                        raise TemplatingError('Conversion error occurred.')
                 else:
-                    raise Error(message='Unsupported libreoffice method.')
+                    raise TemplatingError(message='Unsupported libreoffice method.')
+        except IOError as error:
+            raise TemplatingError('Conversion error occurred.', cause=error)
         except pylokit.LoKitInitializeError as error:
-            raise ConversionError(cause=error)
+            raise TemplatingError('Conversion error occurred.', cause=error)
         except pylokit.LoKitImportError as error:
-            raise ConversionError(cause=error)
+            raise TemplatingError('Conversion error occurred.', cause=error)
         except pylokit.LoKitExportError as error:
-            raise ConversionError(cause=error)
+            raise TemplatingError('Conversion error occurred.', cause=error)
 
     @staticmethod
     def fix_block(content):
