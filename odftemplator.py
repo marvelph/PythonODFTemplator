@@ -4,7 +4,7 @@
 #  ODFTemplator.py
 #  PythonODFTemplator
 #
-#  Copyright 2017 Kenji Nishishiro. All rights reserved.
+#  Copyright 2013-2020 Kenji Nishishiro. All rights reserved.
 #  Written by Kenji Nishishiro <marvel@programmershigh.org>.
 #
 
