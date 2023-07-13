@@ -61,6 +61,7 @@ class Templator(object):
                     subprocess.call(
                         [
                             self.__libreoffice_path,
+                            "-env:UserInstallation=file://{}".format(document_directory_path),
                             "--convert-to",
                             "pdf",
                             "--outdir",
